@@ -8,125 +8,105 @@ class Hand:
 		self.name = name            #   Player1_hand , Player2_hand
 		self._category = 0			#	0:"Not_Yet_Evaluated" 1: "High_Card" , 9:"Straight_Flush"
 		self._five_cards = []        #  ['4D','5D','9S','AS', 'AD']
-		# self._fiveCardValue = []    # [9,8,7,6,5]  , [A,A,4,4,9]
 		self._hand_name = ""        # High_Card , One_Pair , Flush etc
-		self._rank_list = []	# rank_list =  ['2', '3', '4', '5', '8', 'T', 'A']
-		self._suit_list = []	# suit_list =  ['C', 'D', 'H', 'C', 'C', 'H', 'S']
 		self._flush_cards = []	# self._flush_cards = ['4D','5D','6D','7D','8D','AD']
-		self._arranged_card = [] #arranged_card =  [[0], [1, '3C'], [1, '7C'], [1, '8D'], [1, '9S'], [2, 'TC', 'TD'], [1, 'JC']]
-	
+		self._cards_by_rank = [] #_cards_by_rank =  [[0], [1, '3C'], [1, '7C'], [1, '8D'], [1, '9S'], [2, 'TC', 'TD'], [1, 'JC']]
+		self._product = 1
+
 	def setCards(self,seven_cards = []):
 		self._all_cards = seven_cards
+		
+	def _sort_cards(self):
 		self._all_cards = sorted(self._all_cards ,key=lambda card: RANK_LOOKUP.index(card[0]))
-		print "self._all_cards = " , self._all_cards
+		print "self._all_cards after sorted = " , self._all_cards
 
-		for card in self._all_cards :
-			self._rank_list.append(card[0])
-			self._suit_list.append(card[1])
-
-		print "self._rank_list = " , self._rank_list
-		print "self._suit_list = " , self._suit_list
 
 	def evaluateHand(self):
 		"""
-		Do Evaluation . After hand Evaluation, self.handCategory and sefl.handBestCards will not be None
+		Do Hand Evaluation and
+		Get the best Five Cards ( for displaying, or comparing in case 2 hands have the same Category) .
 
 		"""
 		if len(self._all_cards) != 7 :
 			raise Exception("There are not enough 7 cards in this hand, quit evaluation now ! ")
 			
 
-		print "Evaluating the hand"
+		print "Evaluating the hand . . ."
 
-		# sorting 7 cards based on their Rank
-		# Both works exactly the same self._all_cards.sort(key=lambda card: RANK_LOOKUP.index(card[0]))
+		self._sort_cards()
+		self._cards_by_rank , self._product = self._get_cards_by_rank(self._all_cards)
 		
 
-		# self._rank_list = # [ RANK_LOOKUP.index(card[0]) for card in self._all_cards]
-		# print "self._rank_list = " , self._rank_list
+		if self._has_straight_flush() :
+			self._category = 9
+			self._hand_name = "Straight Flush"
+		elif self._has_four() :
+			self._category = 8
+			self._hand_name = "Four of a Kind"
+			self._five_cards = self._get_Four_of_a_kind_cards()
+		elif self._has_fullhouse() :
+			self._category = 7
+			self._hand_name = "Full house"
+			self._five_cards = self._get_Fullhouse_cards()
+		elif self._has_flush() :
+			self._category = 6
+			self._hand_name = "Flush"
+			i = len(self._flush_cards)
+			self._five_cards = [card for card in self._flush_cards[i-5:i]]
+		elif self._has_straight(self._all_cards) :
+			self._category = 5
+			self._hand_name = "Straight"
+		elif self._has_three() :
+			self._category = 4
+			self._hand_name = "Three of a Kind"
+			self._five_cards = self._get_Three_of_a_kind_cards()
+		elif self._has_two_pairs() :
+			self._category = 3
+			self._hand_name = "Two Pairs"
+			self._five_cards = self._get_Two_Pair_cards()
+		elif self._has_pair() :
+			self._category = 2
+			self._hand_name = "One Pair"
+			self._five_cards = self._get_One_Pair_cards()
+		elif self._has_high_card() :
+			self._category = 1
+			self._hand_name = "High Card"
+			self._five_cards = self._get_High_cards()
 
-		#self._arranged_card = self._get_rank_category(self._all_cards)
-		#print "self._arranged_card = " , self._arranged_card
-		self._sort_cards_by_rank(self._all_cards)
-		
-
-		# if self._has_straight_flush() :
-		# 	self._category = 9
-		# 	self._hand_name = "Straight Flush"
-		# elif self._has_four() :
-		# 	self._category = 8
-		# 	self._hand_name = "Four of a Kind"
-		# elif self._has_fullhouse() :
-		# 	self._category = 7
-		# 	self._hand_name = "Full house"
-		# elif self._has_flush() :
-		# 	self._category = 6
-		# 	self._hand_name = "Flush"
-		#	i = len(self._flush_cards)
-		#	self._five_cards = [card for card in self._flush_cards[i-5:i]]
-		# elif self._has_straight(self._all_cards) :
-		# 	self._category = 5
-		# 	self._hand_name = "Straight"
-		# elif self._has_three() :
-		# 	self._category = 4
-		# 	self._hand_name = "Three of a Kind"
-		# elif self._has_two_pairs() :
-		# 	self._category = 3
-		# 	self._hand_name = "Two Pairs"
-		# elif self._has_pair() :
-		# 	self._category = 2
-		# 	self._hand_name = "One Pair"
-		# elif self._has_high_card() :
-		# 	self._category = 1
-		# 	self._hand_name = "High Card"
-
+		print "The hand is" , self._hand_name
+		print "Five cards are" , self._five_cards
 		
 	def showPlayerCards(self):
 		print "Player %s has these cards %s" %(self.name, self._all_cards)
 
 	def _has_straight_flush(self):
-		if self._has_flush():
-			if self._check_straight_flush(self._flush_cards):
-
+		self._flush_cards = self._get_flush_cards()
+		if len(self._flush_cards) > 0 :
+			straight_flush_cards = self._get_straight_flush_cards()
+			if len(straight_flush_cards) > 0:
+				self._five_cards = straight_flush_cards
 				return True
-	def _check_straight_flush(self, flush_cards):
-		self._five_cards = self._get_straight_cards(flush_cards)
-		if len(self._five_cards) != 0 :
+		return False
+
+	def _get_straight_flush_cards(self):
+		straight_flush_cards = self._get_straight_cards(self._flush_cards)
+		return straight_flush_cards
+
+	
+	def _get_flush_cards(self) :
+		card_string = ''.join(self._all_cards)
+		for suit in SUIT_LOOKUP:
+			suit_count = card_string.count(suit)
+			if suit_count >= 5 :
+				flush_cards = [card for card in self._all_cards if card[1]== suit]
+				return flush_cards
+		return []
+
+	def _has_flush(self):
+		if len(self._flush_cards) > 0 :
 			return True
 		else:
 			return False
-
-	def _has_four(self, all_Cards):
-		set_of_cards = list(set(self._rank_list))
-		if len(set_of_cards) > 4 :
-			return False
-		else:
-			for rank in set_of_cards:
-				rank_count = self._rank_list.count(rank)
-				if rank_count == 4:
-					self._five_cards = [card for card in all_Cards if card[0] == rank]
-					set_of_cards.remove(rank)
-					kicker_rank = max(set_of_cards)
-					kicker_index = self._rank_list(kicker_rank)
-					kicker_suit = self._suit_list[kicker_index]
-					kicker_card = kicker_rank + kicker_suit
-
-					self._five_cards.insert(0, kicker_card)
-					return True
-		return False
-	
-	def _has_fullhouse(self) :
-		return True
-	
-	def _has_flush(self) :
-		for suit in SUIT_LOOKUP:
-			suit_count = self._suit_list.count(suit)
-			if suit_count >= 5 :
-				self._flush_cards = [card for card in self._all_cards if card[1]== suit]
-				print "self._flush_cards = " , self._flush_cards
-				return True
-		return False
-	
 
 	def _has_straight(self, all_cards) :
 		diff_rank_cards = self._get_different_rank_list(all_cards)
@@ -142,7 +122,6 @@ class Hand:
 		for card in all_cards:
 		    if(card[0] != different_rank_list[-1][0]):
         	     different_rank_list.append(card)
-
 		return different_rank_list
 
 	def _get_straight_cards(self, Cards):
@@ -160,52 +139,13 @@ class Hand:
 			i -= 1
 		return []
 	
-	def _get_rank_category(self, all_cards):
-		"""  This will check if hand has Four, Three, Two cards with same rank  """
-		card_group = []
-		card_group_element = []
-		current_rank = 0
-		count = 0
-		
-		for card in all_cards :
-			rank = RANK_LOOKUP.index(card[0])
-
-			if rank == current_rank:
-				count += 1
-				card_group_element.append(card)
-			elif rank != current_rank:
-				card_group_element.insert(0,count)
-				card_group.append(card_group_element)
-
-				# reset counting
-				count = 1
-				card_group_element = []
-				card_group_element.append(card)
-				current_rank = rank
-		card_group_element.insert(0,count)
-		card_group.append(card_group_element)
-		return card_group
-
-	def _sort_cards_by_rank(self, all_cards):
-
+	def _get_cards_by_rank(self, all_cards):
 		card_group = []
 		card_group_element = []
 		product = 1
 		prime_lookup = {0:1, 1:1, 2:2, 3:3, 4:5}
 		count = 0
 		current_rank = 0
-		product_lookup = {	1 : 'High_Card',
-           					2 : 'One_Pair',
-           					3 : 'Three_of_a_Kind',
-           					4 : 'Two_Pairs',
-           					5 : 'Four_of_a_Kind',
-           					6 : 'Fullhouse',
-           					8 : 'Two_Pairs',
-           					9 : 'Fullhouse',
-           					10: 'Four_of_a_Kind',
-           					12: 'Fullhouse',
-           					15: 'Four_of_a_Kind',
-							}
 
 		for card in all_cards:
 			rank = RANK_LOOKUP.index(card[0])
@@ -231,31 +171,119 @@ class Hand:
 				card_group_element = []
 				card_group_element.append(card)
 				current_rank = rank
-		card_group_element.insert(0,count)
-		card_group.append(card_group_element)
-		print "card_group = " , card_group
+		# the For Loop misses operation for the last card
+		# These 3 lines below to compensate that		
+		product *= prime_lookup[count]
+		card_group_element.insert(0,count)      # insert the number of same rank card to the beginning of the 
+		card_group.append(card_group_element)	# after the loop, there is still one last card to add
+		return card_group , product
 
-
-		self._hand_name = product_lookup[product]
-		print "hand_name = " , self._hand_name
-
-
-
+	def _has_four(self):
+		if self._product == 5 or self._product == 10 or self._product == 15:
+			return True
+		else:	
+			return False
+	
+	def _has_fullhouse(self) :
+		if self._product == 6 or self._product == 9 or self._product == 12:
+			return True
+		else:	
+			return False
 
 	def _has_three(self) :
-		return True
-	
+		if self._product == 3:
+			return True
+		else:	
+			return False	
 
 	def _has_two_pairs(self) :
-		return True
-	
+		if self._product == 4 or self._product == 8:
+			return True
+		else:	
+			return False
 
 	def _has_pair(self) :
-		return True
+		if self._product == 2:
+			return True
+		else:	
+			return False
 	
 
 	def _has_high_card(self) :
-		return True
+		if self._product == 1:
+			return True
+		else:	
+			return False
     
+	def _get_Four_of_a_kind_cards(self):
+		Four_of_a_Kind = []
+		cards_by_rank = self._cards_by_rank
+		cards_len = len(cards_by_rank)
+		for i in reversed(xrange(cards_len)):
+			if cards_by_rank[i][0] == 4 :
+				Four_of_a_Kind = cards_by_rank.pop(i)
+				break
+		kicker = cards_by_rank[-1][1]     # The Last cards_by_rank[The Second element]
+		Four_of_a_Kind[0] = kicker
 
+		return Four_of_a_Kind
 
+	def _get_Fullhouse_cards(self):
+		Fullhouse = []
+		cards_by_rank = self._cards_by_rank
+		cards_len = len(cards_by_rank)
+		for i in reversed(xrange(cards_len)):
+			if cards_by_rank[i][0] == 3 :
+				Trips = cards_by_rank.pop(i)[1:4]
+				break
+		for i in reversed(xrange(cards_len - 1)):
+			if cards_by_rank[i][0] >= 2 :
+				TwoPair = cards_by_rank.pop(i)[1:3]
+				break
+		Fullhouse = TwoPair + Trips
+		return Fullhouse
+	
+	def _get_Three_of_a_kind_cards(self):
+		Trip_cards = []
+		cards_by_rank = self._cards_by_rank
+		cards_len = len(cards_by_rank)
+		for i in reversed(xrange(cards_len)):
+			if cards_by_rank[i][0] == 3 :
+				Trip_cards += cards_by_rank.pop(i)[1:4]
+				break
+     
+		Trip_cards += cards_by_rank.pop(-1)[1:2]
+		Trip_cards += cards_by_rank.pop(-1)[1:2]
+		Trip_cards.reverse()
+		return Trip_cards
+
+	def _get_Two_Pair_cards(self):
+		Two_Pair_cards = []
+		cards_by_rank = self._cards_by_rank
+		cards_len = len(cards_by_rank)
+		for i in reversed(xrange(cards_len)):
+			if cards_by_rank[i][0] == 2 and len(Two_Pair_cards) < 3 :
+				Two_Pair_cards += cards_by_rank.pop(i)[1:3]
+     
+		Two_Pair_cards += cards_by_rank.pop(-1)[1:2]
+		Two_Pair_cards.reverse()
+		return Two_Pair_cards
+
+	def _get_One_Pair_cards(self):
+		One_Pair_cards = []
+		cards_by_rank = self._cards_by_rank
+		cards_len = len(cards_by_rank)
+		for i in reversed(xrange(cards_len)):
+			if cards_by_rank[i][0] == 2 :
+				One_Pair_cards += cards_by_rank.pop(i)[1:3]
+				break
+     
+		One_Pair_cards += cards_by_rank.pop(-1)[1:2]
+		One_Pair_cards += cards_by_rank.pop(-1)[1:2]
+		One_Pair_cards += cards_by_rank.pop(-1)[1:2]
+		One_Pair_cards.reverse()
+		return One_Pair_cards
+
+	def _get_High_cards(self):
+		High_cards = self._all_cards[2:7]
+		return High_cards
