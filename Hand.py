@@ -15,11 +15,9 @@ class Hand:
 
 	def setCards(self,seven_cards = []):
 		self._all_cards = seven_cards
-		
+
 	def _sort_cards(self):
 		self._all_cards = sorted(self._all_cards ,key=lambda card: RANK_LOOKUP.index(card[0]))
-		print "self._all_cards after sorted = " , self._all_cards
-
 
 	def evaluateHand(self):
 		"""
@@ -29,13 +27,11 @@ class Hand:
 		"""
 		if len(self._all_cards) != 7 :
 			raise Exception("There are not enough 7 cards in this hand, quit evaluation now ! ")
-			
 
-		print "Evaluating the hand . . ."
 
 		self._sort_cards()
 		self._cards_by_rank , self._product = self._get_cards_by_rank(self._all_cards)
-		
+
 
 		if self._has_straight_flush() :
 			self._category = 9
@@ -73,11 +69,6 @@ class Hand:
 			self._hand_name = "High Card"
 			self._five_cards = self._get_High_cards()
 
-		print "The hand is" , self._hand_name
-		print "Five cards are" , self._five_cards
-		
-	def showPlayerCards(self):
-		print "Player %s has these cards %s" %(self.name, self._all_cards)
 
 	def _has_straight_flush(self):
 		self._flush_cards = self._get_flush_cards()
@@ -92,7 +83,7 @@ class Hand:
 		straight_flush_cards = self._get_straight_cards(self._flush_cards)
 		return straight_flush_cards
 
-	
+
 	def _get_flush_cards(self) :
 		card_string = ''.join(self._all_cards)
 		for suit in SUIT_LOOKUP:
@@ -138,7 +129,7 @@ class Hand:
 				return five_cards
 			i -= 1
 		return []
-	
+
 	def _get_cards_by_rank(self, all_cards):
 		card_group = []
 		card_group_element = []
@@ -172,49 +163,49 @@ class Hand:
 				card_group_element.append(card)
 				current_rank = rank
 		# the For Loop misses operation for the last card
-		# These 3 lines below to compensate that		
+		# These 3 lines below to compensate that
 		product *= prime_lookup[count]
-		card_group_element.insert(0,count)      # insert the number of same rank card to the beginning of the 
+		card_group_element.insert(0,count)      # insert the number of same rank card to the beginning of the
 		card_group.append(card_group_element)	# after the loop, there is still one last card to add
 		return card_group , product
 
 	def _has_four(self):
 		if self._product == 5 or self._product == 10 or self._product == 15:
 			return True
-		else:	
+		else:
 			return False
-	
+
 	def _has_fullhouse(self) :
 		if self._product == 6 or self._product == 9 or self._product == 12:
 			return True
-		else:	
+		else:
 			return False
 
 	def _has_three(self) :
 		if self._product == 3:
 			return True
-		else:	
-			return False	
+		else:
+			return False
 
 	def _has_two_pairs(self) :
 		if self._product == 4 or self._product == 8:
 			return True
-		else:	
+		else:
 			return False
 
 	def _has_pair(self) :
 		if self._product == 2:
 			return True
-		else:	
+		else:
 			return False
-	
+
 
 	def _has_high_card(self) :
 		if self._product == 1:
 			return True
-		else:	
+		else:
 			return False
-    
+
 	def _get_Four_of_a_kind_cards(self):
 		Four_of_a_Kind = []
 		cards_by_rank = self._cards_by_rank
@@ -242,7 +233,7 @@ class Hand:
 				break
 		Fullhouse = TwoPair + Trips
 		return Fullhouse
-	
+
 	def _get_Three_of_a_kind_cards(self):
 		Trip_cards = []
 		cards_by_rank = self._cards_by_rank
@@ -251,7 +242,7 @@ class Hand:
 			if cards_by_rank[i][0] == 3 :
 				Trip_cards += cards_by_rank.pop(i)[1:4]
 				break
-     
+
 		Trip_cards += cards_by_rank.pop(-1)[1:2]
 		Trip_cards += cards_by_rank.pop(-1)[1:2]
 		Trip_cards.reverse()
@@ -264,7 +255,7 @@ class Hand:
 		for i in reversed(xrange(cards_len)):
 			if cards_by_rank[i][0] == 2 and len(Two_Pair_cards) < 3 :
 				Two_Pair_cards += cards_by_rank.pop(i)[1:3]
-     
+
 		Two_Pair_cards += cards_by_rank.pop(-1)[1:2]
 		Two_Pair_cards.reverse()
 		return Two_Pair_cards
@@ -277,7 +268,7 @@ class Hand:
 			if cards_by_rank[i][0] == 2 :
 				One_Pair_cards += cards_by_rank.pop(i)[1:3]
 				break
-     
+
 		One_Pair_cards += cards_by_rank.pop(-1)[1:2]
 		One_Pair_cards += cards_by_rank.pop(-1)[1:2]
 		One_Pair_cards += cards_by_rank.pop(-1)[1:2]
@@ -287,3 +278,12 @@ class Hand:
 	def _get_High_cards(self):
 		High_cards = self._all_cards[2:7]
 		return High_cards
+
+	def show_player_cards(self):
+		print "Player %s has these cards %s" %(self.name, self._all_cards)
+
+	def show_player_evaluated_hand_name(self):
+		print "The hand is %s" %(self._hand_name)
+
+	def show_player_evaluated_five_cards(self):
+		print "Five cards with best hand are %s" %(self._five_cards)
