@@ -1,5 +1,4 @@
-PokerGame is written in Python 2.7
-The game is based on Texas Holdem Poker
+PokerGame is written in Python 2.7. The game is based on Texas Holdem Poker.
 Each player has 2 private cards and there are 5 common cards on the table
 
 Features :
@@ -9,6 +8,6 @@ Features :
 - There are 2 players at the moment : User and the House.
 
 
-To play the game, open Terminal and go to PokerGame directory
-Execute this command
+To play the game, open Terminal and go to PokerGame directory then execute this command
+
 MacBook-Pro:PokerGame User$ python Poker.py
