@@ -101,7 +101,7 @@ class PokerGame:
         print self._house.name , "has", self._house.get_chips(), "chips"
         print "After", self._round_count , "rounds"
         if self._player.get_chips() > 0 :
-            print "The winner is", self._player.name
+            print "The winner is the", self._player.name
         elif self._player.get_chips() <= 0 :
             print "The winner is the", self._house.name
 
@@ -196,8 +196,8 @@ class PokerGame:
             elif round_winner == 2:
                 print "Player WINS this round"
                 self.transfer_chips(self._board , self._player, "all")
-            elif rounde_winner == 0:
-                print "DRAWS , player and house split the pot"
+            elif round_winner == 0:
+                print "DRAWS , player and the house split the pot"
                 half = self._board.get_chips() / 2
                 self.transfer_chips(self._board , self._house, half)
                 self.transfer_chips(self._board , self._player, half)

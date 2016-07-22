@@ -25,7 +25,7 @@ def print_instruction():
     print "S: Spades , C: Clubs , D: Diamonds, H: Hearts"
     print "T: 10 , J: Jack , Q: Queen , K: King , A: Ace"
     print "Examples:"
-    print "4H : Four of diamonds"
+    print "4D : Four of diamonds"
     print "JC : Jack of clubs"
     print "-----------------------END OF INSTRUCTION----------------------------"
     raw_input("Press Enter to continue ...")
