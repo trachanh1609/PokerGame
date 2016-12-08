@@ -18,11 +18,11 @@ Game is written in Python 2.7, no dependencies so it will be working as long as 
 ( Note : S stands for Spades, C for Clubs, D for Diamonds, H for Hearts)
 Ex1:
 Input 7 cards ['KC', '2S', '6S', 'KH', '5D', '3D', '4S']
-Hand.py will evaluates and picks out 5 cards ['2S', 3D', '4S', '5D', '6S'] (Straight , not One Pair)
+Hand.py will evaluates and picks out 5 cards ['2S', 3D', '4S', '5D', '6S'] - Straight , not One Pair
 
 Ex2:
 Input 7 cards ['KC', 'KS', '6S', 'KH', '6D', '6H', '4S']
-Hand.py will evaluates and picks out 5 cards ['6S', 6D', 'KH', 'KD', 'KS']  ( Full house '66KKK' not 'KK666')
+Hand.py will evaluates and picks out 5 cards ['6S', 6D', 'KH', 'KD', 'KS']  - Full house '66KKK' not 'KK666'
 
 ### Test
 hand_test.py is the test file for Hand.py and
