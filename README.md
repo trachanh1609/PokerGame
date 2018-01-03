@@ -10,7 +10,7 @@ Game is written in Python 2.7, no dependencies so it will be working as long as 
  4. Navigate to the folder
  5. Run the Poker.py file PokerGame$python Poker.py
 
-###Features :
+### Features :
 
 - Hand.py evaluates 7 card and picks 5 best cards out of 7 cards.
 - The 5 best cards are sorted in ascending order to simplify the hand comparison in case 2 hands have the same category.
